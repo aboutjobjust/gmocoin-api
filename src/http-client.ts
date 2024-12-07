@@ -1,4 +1,3 @@
-import axios, { AxiosRequestConfig } from 'axios';
 import {
   ApiConfig,
   ResponseRoot,
@@ -284,47 +283,42 @@ export class GmoCoinApi {
   }
 
   private async request<T>(baseUrl: string, method: ArrowedHttpMethod, path: string, params?: {}, data?: {}, headers?: HttpHeader) {
-    let options: AxiosRequestConfig = {
-      method,
-      baseURL: baseUrl,
-      url: path,
-      timeout: this.timeout,
-      headers: {
-        'Content-Type': 'application/json',
-      } as HttpHeader,
-    };
+    const url = new URL(baseUrl + path);
 
     if (params && Object.keys(params).length > 0) {
-      options = {
-        ...options,
-        params,
-      };
+      Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.append(key, String(value));
+      });
     }
 
-    if (data && Object.keys(data).length > 0) {
-      options = {
-        ...options,
-        data,
-      };
-    }
+    const fetchHeaders: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...headers,
+    };
 
-    if (headers && Object.keys(headers).length > 0) {
-      options = {
-        ...options,
-        headers,
-      };
-    }
+    const options: RequestInit = {
+      method,
+      headers: fetchHeaders,
+      body: data && Object.keys(data).length > 0 ? JSON.stringify(data) : undefined,
+    };
 
-    const response = await axios.request<ResponseRoot<T>>(options);
-    if (response.data && response.data.messages) {
-      const errors = response.data.messages;
-      // here we throw the first error we can identify
-      for (const error of errors) {
-        throw new Error(error.message_string);
+    try {
+      const response = await fetch(url.toString(), options);
+      if (!response.ok) {
+        const errorMessage = `HTTP error! Status: ${response.status} ${response.statusText}`;
+        throw new Error(errorMessage);
       }
+      const responseData: ResponseRoot<T> = await response.json();
+      if (responseData.messages) {
+        for (const error of responseData.messages) {
+          throw new Error(error.message_string);
+        }
+      }
+      return responseData;
+    } catch (error) {
+      console.error("Fetch request error:", error);
+      throw error;
     }
-
-    return response.data;
   }
 
   private async requestWithAuth<T>(baseUrl: string, method: ArrowedHttpMethod, path: string, params?: {}, data?: {}) {
@@ -336,7 +330,7 @@ export class GmoCoinApi {
       throw new Error('You need to pass an API Secret to create this instance.');
     }
 
-    const headers = makeAuthHeader(this.apiKey, this.secretKey, method, path, params, data);
+    const headers = await makeAuthHeader(this.apiKey, this.secretKey, method, path, params, data);
 
     return this.request<T>(baseUrl, method, path, params, data, headers);
   }

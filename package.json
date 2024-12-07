@@ -1,48 +1,26 @@
 {
-  "name": "gmocoin-api-node",
+  "name": "gmocoin-api",
   "version": "0.2.7",
   "description": "",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest",
-    "lint": "eslint . --config .eslintrc.js --ext .ts",
-    "lint:fix": "yarn run lint --fix",
     "format": "prettier --config .prettierrc --write '**/*.ts'",
     "build": "tsc -p tsconfig.json",
-    "sample": "npx ts-node sample.ts",
-    "sample:private": "npx ts-node sample.private.ts"
+    "sample": "npx tsx sample.ts",
+    "sample:private": "npx tsx sample.private.ts"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/daikiojm/gmocoin-api-node.git"
+    "url": "git+https://github.com/aboutjobjust/gmocoin-api.git"
   },
   "keywords": [
     "gmocoin",
     "api"
   ],
-  "author": "daikiojm",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/daikiojm/gmocoin-api-node/issues"
-  },
-  "homepage": "https://github.com/daikiojm/gmocoin-api-node#readme",
   "devDependencies": {
-    "@types/jest": "^25.2.1",
-    "@types/node": "^13.13.4",
-    "@typescript-eslint/eslint-plugin": "^2.30.0",
-    "@typescript-eslint/parser": "^2.30.0",
-    "dotenv": "^8.2.0",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-tsdoc": "^0.2.4",
-    "jest": "^25.5.0",
-    "jest-date-mock": "^1.0.8",
-    "prettier": "^2.0.5",
-    "ts-jest": "^25.4.0",
-    "typescript": "^3.8.3"
-  },
-  "dependencies": {
-    "axios": "^0.21.1"
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
   }
 }
